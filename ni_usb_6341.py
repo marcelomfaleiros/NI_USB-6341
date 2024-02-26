@@ -1,8 +1,10 @@
 # encoding: utf-8
 
 from usb6341_interface import Ui_MainWindow
+from PyQt5.QtCore import QThread, pyqtSignal
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtWidgets as qtw
+import nidaqmx as daq
 import numpy as np
 import time
 import keyboard
@@ -13,52 +15,37 @@ import keyboard
 
 """
 
-import nidaqmx as daqmx
-import time
-
 class Worker(QThread):
-    signal = pyqtSignal(object)
+    signal_point = pyqtSignal(object)
+    signal_data = pyqtSignal(object)
     finished = pyqtSignal()
-    position_mm = pyqtSignal(float)
 
-    def move_stage_fs(self, target_delay):                                     
-        target_fs = target_delay + self.zero/0.0003             #compute target delay position
-        self.smc.move_abs_fs(target_fs)                         #move to target position in fs
-        self.current_mm = self.smc.current_position()           #read current stage position          
-        self.position_mm.emit(self.current_mm)
-
-    def run(self):
-        self.mode = 'measure'
-
-        if self.channel == 'CH1 output':
-            channel = 'ch1'
-        elif self.channel == 'CH2 output':
-            channel = 'ch2'
-
+    def run(self):    
         intnsity_array = []
-        stdrd_array = []
         dlay_array = []
-              
-        for target_delay in range(self.init_pos, (self.fin_pos + self.step), self.step):
-            if keyboard.is_pressed('Escape'):
-                break 
-            dlay_array.append(target_delay)  
-            self.move_stage_fs(target_delay)        
-            #lock-in measurement
-            y = self.sr830.measure_buffer(channel, self.sampling_time)
-            y_mean = y[0]
-            y_std = [1]
-            #intensity_array.append(lock-in measurement)
-            intnsity_array.append(y[0])
-            stdrd_array.append(y[1])
+        x = 0
 
+        #task = daq.Task() 
+        #task.ai_channels.add_ai_voltage_chan(self.channel)
+              
+        while True:
+            if keyboard.is_pressed('Escape'):
+                break      
+            #measurement
+            #y = task.read()
+            x += 1 
+            y = np.random.rand()
+            
+            #intensity_array.append(lock-in measurement)
+            dlay_array.append(x)
+            intnsity_array.append(y)
+            
             delay_array = np.array(dlay_array)
             intensity_array = np.array(intnsity_array)
             self.point = (delay_array, intensity_array)
              
-            self.signal.emit(self.point)
-
-        self.data = delay_array, intensity_array, stdrd_array
+            self.signal_point.emit(self.point)
+            self.signal_data.emit(self.point)
     
         self.finished.emit()
 
@@ -68,72 +55,90 @@ class NiUsb6341(qtw.QMainWindow, Ui_MainWindow):
 
         self.setObjectName("NI USB-6341")
         self.setupUi(self)
+
+        self.thread = Worker()
                 
-        self.init_pushButton.clicked.connect(self.set_up)
-        self.start_pushButton.clicked.connect(self.run)
-        #self.stop_pushButton.clicked.connect(self.stop)
+        self.init_pushButton.clicked.connect(self.start_up)
         self.clear_pushButton.clicked.connect(self.clear)
         self.exit_pushButton.clicked.connect(self.exit)
-        
-    def set_up(self):
-        #self.rm = visa.ResourceManager()
-        #self.spex = self.rm.open_resource('GPIB0::2')
-        self.graph_start()
+        self.ai0_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        self.ai1_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        self.ai2_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        self.ai3_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        self.ai4_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        self.ai5_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        self.ai6_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        self.ai7_pushButton.clicked.connect(lambda: self.run("Dev1/ai0"))
+        '''self.pfi0_pushButton.clicked.connect()
+        self.pfi1_pushButton.clicked.connect()
+        self.pfi2_pushButton.clicked.connect()
+        self.pfi3_pushButton.clicked.connect()
+        self.pfi4_pushButton.clicked.connect()
+        self.pfi5_pushButton.clicked.connect()
+        self.pfi6_pushButton.clicked.connect()
+        self.pfi7_pushButton.clicked.connect()'''          
 
-    def graph_start(self):
+    def start_up(self):
+        self.thread.task = daq.Task() 
+
+        self.file = qtw.QFileDialog.getSaveFileName()[0]
+
         self.clear()
         
-        #self.wl_array = [i for i in range(200, 1000, 2)]
-        #self.emission_array = []
+        x = []
+        y = []
         
         self.graphicsView.showGrid(x=True, y=True, alpha=True)
-        self.graphicsView.setLabel("left", "PD signal", units="A.U.")
+        self.graphicsView.setLabel("left", "PMT signal", units="A.U.")
         self.graphicsView.setLabel("bottom", "Time", units="s")
+
+        self.graphicsView.plot(x, y)
   
-    def run(self):
+    def run(self, channel=str):
+        self.thread.task.ai_channels.add_ai_voltage_chan(channel)
         #set interface elements as Worker thread elements
-        self.thread.channel = self.comboBox.currentText()
-        self.thread.move_to = float(self.move_to_lineEdit.text())
-        self.thread.delay = int(self.delay_lineEdit.text())
-        self.thread.init_pos = int(self.init_pos_lineEdit.text())
-        self.thread.fin_pos = int(self.fin_pos_lineEdit.text())
-        self.thread.step = int(self.step_lineEdit.text())
-        self.thread.sampling_time = float(self.sample_lineEdit.text())
-        self.thread.signal.connect(self.plot)
-        self.thread.position_mm.connect(self.show_position)
+        self.thread.signal_point.connect(self.plot)
+        self.thread.signal_data.connect(self.save)
         self.thread.start()
         #disable interface buttons while measurement is running
+        self.ai0_pushButton.setEnabled(False)
+        self.ai1_pushButton.setEnabled(False)
+        self.ai2_pushButton.setEnabled(False)
+        self.ai3_pushButton.setEnabled(False)
+        self.ai4_pushButton.setEnabled(False)
+        self.ai5_pushButton.setEnabled(False)
+        self.ai6_pushButton.setEnabled(False)
+        self.ai7_pushButton.setEnabled(False)
+        self.pfi0_pushButton.setEnabled(False)
+        self.pfi1_pushButton.setEnabled(False)
+        self.pfi2_pushButton.setEnabled(False)
+        self.pfi3_pushButton.setEnabled(False)
+        self.pfi4_pushButton.setEnabled(False)
+        self.pfi5_pushButton.setEnabled(False)
+        self.pfi6_pushButton.setEnabled(False)
+        self.pfi7_pushButton.setEnabled(False)
         self.init_pushButton.setEnabled(False)
-        self.one_fs_pushButton.setEnabled(False)
-        self.mone_fs_pushButton.setEnabled(False)
-        self.five_fs_pushButton.setEnabled(False)
-        self.mfive_fs_pushButton.setEnabled(False)
-        self.ten_fs_pushButton.setEnabled(False)
-        self.mten_fs_pushButton.setEnabled(False)
-        self.twenty_fs_pushButton.setEnabled(False)
-        self.mtwenty_fs_pushButton.setEnabled(False)
-        self.move_to_pushButton.setEnabled(False)
-        self.delay_pushButton.setEnabled(False)
-        self.freerun_pushButton.setEnabled(False)
-        self.start_pushButton.setEnabled(False)
-        self.save_pushButton.setEnabled(False)
         self.clear_pushButton.setEnabled(False)
         self.exit_pushButton.setEnabled(True)
-        #connect the interface buttons to the Worker thread
-        self.thread.finished.connect(lambda: self.init_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.one_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.mone_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.five_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.mfive_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.ten_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.mten_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.twenty_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.mtwenty_fs_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.move_to_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.delay_pushButton.setEnabled(True))        
+        #enable interface buttons when measurement stop
+        self.thread.finished.connect(lambda: self.ai0_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.ai1_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.ai2_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.ai3_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.ai4_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.ai5_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.ai6_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.ai7_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.pfi0_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.pfi1_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.pfi2_pushButton.setEnabled(True))   
+        self.thread.finished.connect(lambda: self.pfi3_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.pfi4_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.pfi5_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.pfi6_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.pfi7_pushButton.setEnabled(True))     
         self.thread.finished.connect(lambda: self.start_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.freerun_pushButton.setEnabled(True))
-        self.thread.finished.connect(lambda: self.save_pushButton.setEnabled(True))
+        self.thread.finished.connect(lambda: self.init_pushButton.setEnabled(True))
         self.thread.finished.connect(lambda: self.clear_pushButton.setEnabled(True))
         self.thread.finished.connect(lambda: self.exit_pushButton.setEnabled(True))
 
@@ -141,18 +146,12 @@ class NiUsb6341(qtw.QMainWindow, Ui_MainWindow):
         self.graphicsView.plot(point[0], point[1], pen=None, symbol='o', clear=False)
         pg.QtWidgets.QApplication.processEvents()
 
-    def save(self):  
-        if self.thread.mode == 'measure':
-            raw_data = np.array(self.thread.data)
-        elif self.thread.mode == 'free run':
-            raw_data = np.array(self.data)
+    def save(self, point):  
+        raw_data = np.array(point)
         transposed_raw_data = np.vstack(raw_data)                      
         data = transposed_raw_data.transpose()
-        file_spec = qtw.QFileDialog.getSaveFileName()[0]
-        np.savetxt(file_spec, data)    
-
-    def stop(self):
-        pass
+        
+        np.savetxt(self.file, data)    
 
     def clear(self):
         self.graphicsView.clear()

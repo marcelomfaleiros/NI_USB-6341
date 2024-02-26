@@ -60,36 +60,11 @@
               <bold>true</bold>
              </font>
             </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(85, 255, 127);</string>
+            </property>
             <property name="text">
              <string>Initialize</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="start_pushButton">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Start</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="stop_pushButton">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Stop</string>
             </property>
            </widget>
           </item>
@@ -101,6 +76,9 @@
               <weight>75</weight>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(85, 255, 127);</string>
             </property>
             <property name="text">
              <string>Clear</string>
@@ -115,6 +93,9 @@
               <weight>75</weight>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(85, 255, 127);</string>
             </property>
             <property name="text">
              <string>Exit</string>
@@ -160,8 +141,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI4</string>
+                <string>Run AI4</string>
                </property>
               </widget>
              </item>
@@ -174,8 +158,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI5</string>
+                <string>Run AI5</string>
                </property>
               </widget>
              </item>
@@ -188,8 +175,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI6</string>
+                <string>Run AI6</string>
                </property>
               </widget>
              </item>
@@ -202,8 +192,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI7</string>
+                <string>Run AI7</string>
                </property>
               </widget>
              </item>
@@ -216,8 +209,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI2</string>
+                <string>Run AI2</string>
                </property>
               </widget>
              </item>
@@ -230,8 +226,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI0</string>
+                <string>Run AI0</string>
                </property>
               </widget>
              </item>
@@ -244,8 +243,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI3</string>
+                <string>Run AI3</string>
                </property>
               </widget>
              </item>
@@ -258,8 +260,11 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(85, 255, 127);</string>
+               </property>
                <property name="text">
-                <string>AI1</string>
+                <string>Run AI1</string>
                </property>
               </widget>
              </item>
@@ -298,6 +303,9 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
+               </property>
                <property name="text">
                 <string>PFI 0 / P1.0</string>
                </property>
@@ -311,6 +319,9 @@
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
                </property>
                <property name="text">
                 <string>PFI 1 / P1.1</string>
@@ -326,6 +337,9 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
+               </property>
                <property name="text">
                 <string>PFI 7 / P1.7</string>
                </property>
@@ -339,6 +353,9 @@
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
                </property>
                <property name="text">
                 <string>PFI 4 / P1.4</string>
@@ -354,6 +371,9 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
+               </property>
                <property name="text">
                 <string>PFI 5 / P1.5</string>
                </property>
@@ -367,6 +387,9 @@
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
                </property>
                <property name="text">
                 <string>PFI 6 / P1.6</string>
@@ -382,6 +405,9 @@
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
+               </property>
                <property name="text">
                 <string>PFI 2 / P1.2</string>
                </property>
@@ -395,6 +421,9 @@
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(0, 170, 255);</string>
                </property>
                <property name="text">
                 <string>PFI 3 / P1.3</string>
